@@ -4,6 +4,7 @@ import requests
 import re
 import urllib3
 import time
+from handler_insert_data import lagou_mysql
 urllib3.disable_warnings()
 class Handler_Lagou(object):
     def __init__(self):
@@ -13,7 +14,7 @@ class Handler_Lagou(object):
         }
         self.city_list=""
     def handle_city(self):
-        city_search=re.compile(r'zhaopin/">(.*?)</a>')
+        city_search=re.compile(r'www\.lagou\.com\/.*\/">(.*?)</a>')
         city_url='https://www.lagou.com/jobs/allCity.html'
         city_result=self.handle_request(method='GET',url=city_url)
         self.city_list=city_search.findall(city_result)
@@ -40,7 +41,8 @@ class Handler_Lagou(object):
                 lagou_data = json.loads(response)
                 job_list = lagou_data['content']['positionResult']['result']
                 for job in job_list:
-                    print(job)
+                    lagou_mysql.insert_item(job)
+
     def handle_request(self,method,url,data=None,info=None):
         while True:
             try:
